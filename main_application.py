@@ -32,16 +32,25 @@ class MainApplication(QMainWindow, Ui_TESTER):
         self.start_record = False
 
         # add events handler
-        self.port_x_pushButton.clicked.connect(self.port_x_button)
-        self.port_y_pushButton.clicked.connect(self.port_y_button)
-        self.port_plc_pushButton.clicked.connect(self.port_plc_button)
+        self.connect_pushButton.clicked.connect(
+            self.connect_pushButton_pressed)
         self.stop_pushButton.clicked.connect(self.stop_button)
         self.start_pushButton.clicked.connect(self.start_button)
-        self.test_pushButton.clicked.connect(self.test_button)
+        self.connect_pushButton.clicked.connect(
+            self.connect_pushButton_pressed)
         self.save_data_pushButton.clicked.connect(self.save_data_button)
+        self.setD_pushButton.clicked.connect(self.set_distance_button)
+        self.clear_data_pushButton.clicked.connect(self.clear_data_listview)
         self.show()
 
+    def clear_data_listview(self):
+        self.data_show_textEdit.clear()
+
+    def set_distance_button(self):
+        pass
+
     def read_comport(self):
+        """ Read available comport and add to combobox"""
         ports = serial.tools.list_ports.comports()
         for port in ports:
             self.port_x_comboBox.addItem(port.device)
@@ -99,7 +108,14 @@ class MainApplication(QMainWindow, Ui_TESTER):
 
         return raw_data
 
+    def connect_pushButton_pressed(self):
+        """ Connect to the selected port"""
+        self.port_x_button()
+        self.port_y_button()
+        self.port_plc_button()
+
     def port_x_button(self):
+        """ Connect to the selected port """
         selected_port = self.port_x_comboBox.currentText()
         try:
             self.xloadcell_ser.port = selected_port
@@ -116,6 +132,7 @@ class MainApplication(QMainWindow, Ui_TESTER):
             print(f"Error opening serial port: {e}")
 
     def port_y_button(self):
+        """ Connect to the selected port """
         selected_port = self.port_y_comboBox.currentText()
         try:
             self.yloadcell_ser.port = selected_port
@@ -132,6 +149,7 @@ class MainApplication(QMainWindow, Ui_TESTER):
             print(f"Error opening serial port: {e}")
 
     def port_plc_button(self):
+        """ Connect to the selected port """
         selected_port = self.port_plc_comboBox.currentText()
         try:
             self.plc_ser.port = selected_port
@@ -148,10 +166,12 @@ class MainApplication(QMainWindow, Ui_TESTER):
             print(f"Error opening serial port: {e}")
 
     def stop_button(self):
+        """ Stop the recording"""
         print("stop_button")
         self.start_record = False
 
     def start_button(self):
+        """ Start the recording"""
         # check vertical loadcell connection
         if self.yloadcell_ser.is_open == False:
             self.yloadcell_ser.open()
@@ -183,6 +203,7 @@ class MainApplication(QMainWindow, Ui_TESTER):
         self.start_record = True
 
     def timer_event(self):
+        """" Timer event to read data from loadcell and PLC"""
         # reset timer and run timer again
         if self.start_record == True:
             self.timer.start(50)
@@ -222,6 +243,7 @@ class MainApplication(QMainWindow, Ui_TESTER):
         print("test_button")
 
     def save_data_button(self):
+        """ Save data to file"""
         if self.start_record == True:
             self.timer.stop()
             self.start_record = False

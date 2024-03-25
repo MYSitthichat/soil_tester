@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'test_ui.ui'
+## Form generated from reading UI file 'test_UI.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.2
 ##
