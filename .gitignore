@@ -1,0 +1,17 @@
+*.pyc
+*.yaml
+*.yml
+*.log
+*.ini
+*.conf
+*.exe
+*.pyd
+*.dll
+*.zip
+*.toc
+*.pyz
+*.txt
+*.html
+*.spec
+*.qm
+*.pkg
