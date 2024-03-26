@@ -228,7 +228,7 @@ class MainApplication(QMainWindow, Ui_TESTER):
         self.plc_rtu.write_coil(address=4, value=0, slave=1)
 
         self.plc_rtu.write_register(address=10, value=4000, slave=1)
-        self.plc_rtu.write_register(address=1, value=1000, slave=1)
+        # self.plc_rtu.write_register(address=1, value=1000, slave=1)
 
         self.plc_rtu.write_coil(address=10, value=1, slave=1)
         self.plc_rtu.write_coil(address=0, value=1, slave=1)
