@@ -17,7 +17,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QLabel,
     QLineEdit, QMainWindow, QPushButton, QSizePolicy,
-    QStatusBar, QTextEdit, QWidget)
+    QStatusBar, QTextEdit, QWidget ,)
 
 class Ui_TESTER(object):
     def setupUi(self, TESTER):
@@ -156,4 +156,12 @@ class Ui_TESTER(object):
         self.save_data_pushButton.setText(QCoreApplication.translate("TESTER", u"SAVE DATA", None))
         self.clear_data_pushButton.setText(QCoreApplication.translate("TESTER", u"Clear data", None))
     # retranslateUi
+
+# if __name__ == "__main__":
+#     app = QApplication([])
+#     tester = QMainWindow()
+#     ui = Ui_TESTER()
+#     ui.setupUi(tester)
+#     tester.show()
+#     app.exec()
 

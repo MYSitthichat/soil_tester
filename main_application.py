@@ -2,16 +2,16 @@
 
 import sys
 import serial
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QIcon
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog , QMessageBox
+from PySide6.QtCore import Qt 
+from PySide6.QtGui import QIcon 
 from test_ui import Ui_TESTER
 
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QTimer 
 
 from pymodbus.client import ModbusSerialClient
 from datetime import datetime
-from PySide6.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QFileDialog 
 import serial.tools.list_ports
 
 
@@ -45,9 +45,42 @@ class MainApplication(QMainWindow, Ui_TESTER):
 
     def clear_data_listview(self):
         self.data_show_textEdit.clear()
+        QMessageBox.information(self, 'Information', 'Data cleared')
+        
+
+
 
     def set_distance_button(self):
-        pass
+        # 1 millimeter = 20 real data and not over 4000 real data
+        if self.plc_rtu.connected == False:
+            self.plc_rtu.connect()
+            # print("PLC connected")
+        self.plc_rtu.write_register(address=10, value=4000, slave=1)
+        self.plc_rtu.write_coil(address=10, value=1, slave=1)
+        self.plc_rtu.write_coil(address=0, value=1, slave=1)
+
+
+        self.read_horizontal = self.plc_rtu.read_holding_registers(address=0, count=1, slave=1)
+
+        self.displacment_x_lineEdit.setText(str(self.read_horizontal.registers[0]))
+        # print(self.read_horizontal.registers[0])
+        
+        offset = self.read_horizontal.registers[0]
+        target = self.displacment_y_lineEdit.text()
+
+        # if target is not digit then show message box
+        if not target.isdigit():
+            QMessageBox.information(self, 'Information', 'Please enter a valid distance')
+        else:
+            target = int(target)
+            target_value = target*40 + offset
+            if target_value > 4000:
+                QMessageBox.information(self, 'Information', 'Please reduce the target distance')
+            else:
+                self.plc_rtu.write_register(address=1, value=target_value, slave=1)
+                self.plc_rtu.write_coil(address=2, value=0, slave=1)
+                self.plc_rtu.write_coil(address=4, value=0, slave=1)
+    
 
     def read_comport(self):
         """ Read available comport and add to combobox"""
@@ -113,6 +146,8 @@ class MainApplication(QMainWindow, Ui_TESTER):
         self.port_x_button()
         self.port_y_button()
         self.port_plc_button()
+        self.plc_rtu = ModbusSerialClient(
+            self.plc_ser.port, baudrate=4800, method='rtu')
 
     def port_x_button(self):
         """ Connect to the selected port """
@@ -124,7 +159,7 @@ class MainApplication(QMainWindow, Ui_TESTER):
             self.xloadcell_ser.open()
             self.xloadcell_ser.close()
             # disable port button
-            self.port_x_pushButton.setEnabled(False)
+            # self.port_x_pushButton.setEnabled(False)
             # disable combobox
             self.port_x_comboBox.setEnabled(False)
             print("Connected to port: ", selected_port)
@@ -141,7 +176,7 @@ class MainApplication(QMainWindow, Ui_TESTER):
             self.yloadcell_ser.open()
             self.yloadcell_ser.close()
             # disable port button
-            self.port_y_pushButton.setEnabled(False)
+            # self.port_y_pushButton.setEnabled(False)
             # disable combobox
             self.port_y_comboBox.setEnabled(False)
             print("Connected to port: ", selected_port)
@@ -158,7 +193,7 @@ class MainApplication(QMainWindow, Ui_TESTER):
             self.plc_ser.open()
             self.plc_ser.close()
             # disable port button
-            self.port_plc_pushButton.setEnabled(False)
+            # self.port_plc_pushButton.setEnabled(False)
             # disable combobox
             self.port_plc_comboBox.setEnabled(False)
             print("Connected to port: ", selected_port)
@@ -169,6 +204,9 @@ class MainApplication(QMainWindow, Ui_TESTER):
         """ Stop the recording"""
         print("stop_button")
         self.start_record = False
+        if self.plc_rtu.connected == True:
+            self.plc_rtu.close()
+            print("PLC disconnected")
 
     def start_button(self):
         """ Start the recording"""
@@ -182,10 +220,11 @@ class MainApplication(QMainWindow, Ui_TESTER):
             self.xloadcell_ser.open()
             print("X loadcell connected")
 
-        self.plc_rtu = ModbusSerialClient(
-            self.plc_ser.port, baudrate=4800, method='rtu')
-        self.plc_rtu.connect()
-        print("PLC connected")
+        if not self.plc_rtu:
+            self.plc_rtu = ModbusSerialClient(
+                self.plc_ser.port, baudrate=4800, method='rtu')
+            self.plc_rtu.connect()
+            print("PLC connected")
         self.plc_rtu.write_coil(address=4, value=0, slave=1)
 
         self.plc_rtu.write_register(address=10, value=4000, slave=1)
@@ -195,6 +234,7 @@ class MainApplication(QMainWindow, Ui_TESTER):
         self.plc_rtu.write_coil(address=0, value=1, slave=1)
 
         self.plc_rtu.write_coil(address=2, value=1, slave=1)
+
 
         # set timer
         self.timer = QTimer()
@@ -278,7 +318,7 @@ class MainApplication(QMainWindow, Ui_TESTER):
 
     def read_only_textEdit(self):
         self.displacment_x_lineEdit.setReadOnly(True)
-        self.displacment_y_lineEdit.setReadOnly(True)
+        # self.displacment_y_lineEdit.setReadOnly(True)
         self.data_show_textEdit.setReadOnly(True)
 
     def init_serial(self):
