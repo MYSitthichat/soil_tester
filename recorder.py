@@ -3,7 +3,7 @@ import datetime
 import os
 
 
-def get_data(port='COM5'):
+def get_data(port='COM3'):
     """
     Reads data from a serial port and writes it to a file with a timestamp.
 
@@ -25,59 +25,60 @@ def get_data(port='COM5'):
     # Rest of the code
     data_stream = []
     data_state = 0
-    while True:
-        # Read data from the serial port byte by byte
-        while ser.in_waiting:
-            in_bin = ser.read()
-            in_hex = hex(int.from_bytes(
-                in_bin, byteorder='little')).lstrip('0x')
-            if len(in_hex) == 0:
-                in_hex = '00'
-            elif len(in_hex) == 1:
-                in_hex = '0' + in_hex
-            data_stream.append(in_hex)
+    # while True:
+    #     # Read data from the serial port byte by byte
+    #     while ser.in_waiting:
+    #         in_bin = ser.read()
+    #         in_hex = hex(int.from_bytes(
+    #             in_bin, byteorder='little')).lstrip('0x')
+    #         if len(in_hex) == 0:
+    #             in_hex = '00'
+    #         elif len(in_hex) == 1:
+    #             in_hex = '0' + in_hex
+    #         print(in_hex)
+    #         # data_stream.append(in_hex)
 
-            # Process the received data
-            if data_state == 0:
-                if in_hex == 'cf':
-                    data_state = 1
-                else:
-                    data_state = 0
-            elif data_state == 1:
-                if in_hex == 'fc':
-                    data_state = 2
-                else:
-                    data_state = 0
-            elif data_state == 2:
-                if in_hex == 'cc':
-                    data_state = 3
-                else:
-                    data_state = 0
-            elif data_state == 3:
-                if in_hex == 'ff':
-                    data_state = 4
-                else:
-                    data_state = 0
-            else:
-                data_state = 0
+    #         # Process the received data
+            # if data_state == 0:
+            #     if in_hex == 'cf':
+            #         data_state = 1
+            #     else:
+            #         data_state = 0
+            # elif data_state == 1:
+            #     if in_hex == 'fc':
+            #         data_state = 2
+            #     else:
+            #         data_state = 0
+            # elif data_state == 2:
+            #     if in_hex == 'cc':
+            #         data_state = 3
+            #     else:
+            #         data_state = 0
+            # elif data_state == 3:
+            #     if in_hex == 'ff':
+            #         data_state = 4
+            #     else:
+            #         data_state = 0
+            # else:
+            #     data_state = 0
 
-            if data_state == 4:
-                raw_data = data_stream[-9:-4]
-                # print(raw_data)
-                raw_data = ''.join(raw_data)
-                raw_data_int = int(raw_data, 16)
-                print(raw_data_int)
+            # if data_state == 4:
+            #     raw_data = data_stream[-9:-4]
+            #     # print(raw_data)
+            #     raw_data = ''.join(raw_data)
+            #     raw_data_int = int(raw_data, 16)
+            #     print(raw_data_int)
 
-                # Write the data to a file
-                with open('data.txt', 'a') as file:
-                    file.write(str(datetime.datetime.now()) +
-                               ',' + str(raw_data_int) + '\n')
+            #     # Write the data to a file
+            #     with open('data.txt', 'a') as file:
+            #         file.write(str(datetime.datetime.now()) +
+            #                    ',' + str(raw_data_int) + '\n')
 
-                # Reset the data stream and state
-                data_stream = []
-                data_state = 0
+            #     # Reset the data stream and state
+            #     data_stream = []
+            #     data_state = 0
 
 
 if __name__ == "__main__":
     os.system('del data.txt')
-    get_data("COM5")
+    print(get_data("COM3"))

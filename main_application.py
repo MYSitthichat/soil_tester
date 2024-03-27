@@ -259,9 +259,14 @@ class MainApplication(QMainWindow, Ui_TESTER):
 
                 # add timestamp to data
                 current_time = datetime.now()
+                horizontal_real = int(horizontal_value.registers[0])
+                horizontal_mm = int(horizontal_real/40)
 
-                log_message = str(current_time.strftime("%H:%M:%S")) + "," + str(horizontal_value.registers[0]) + "," + str(
-                    vertical_value.registers[0]) + "," + str(xloadcell_value) + "," + yloadcell_value
+                vertical_real = int(vertical_value.registers[0])
+                vertical_mm = int(vertical_real/40)
+
+                log_message = str(current_time.strftime("%H:%M:%S")) + "," + str(horizontal_mm) + "," + str(
+                    vertical_mm) + "," + str(xloadcell_value) + "," + yloadcell_value
                 self.data_show_textEdit.append(log_message)
             except Exception as e:
                 print(f"Error connecting to PLC: {e}")
